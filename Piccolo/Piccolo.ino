@@ -65,7 +65,7 @@ inputs than others.  The software works at making the graph interesting,
 but some columns will always be less lively than others, especially
 comparing live speech against ambient music of varying genres.
 */
-PROGMEM uint8_t
+const uint8_t PROGMEM
   // This is low-level noise that's subtracted from each FFT output column:
   noise[64]={ 8,6,6,5,3,4,4,4,3,4,4,3,2,3,3,4,
               2,1,2,1,3,2,3,2,1,2,3,1,2,3,4,4,
@@ -103,16 +103,17 @@ PROGMEM uint8_t
       1,   2,   5,  10,  18,  30,  46,  67,  92, 118,
     143, 164, 179, 185, 184, 174, 158, 139, 118,  97,
      77,  60,  45,  34,  25,  18,  13,   9,   7,   5,
-      3,   2,   2,   1,   1,   1,   1 },
+      3,   2,   2,   1,   1,   1,   1 };
+
   // And then this points to the start of the data for each of the columns:
-  *colData[] = {
+  const uint8_t * const colData[] PROGMEM = {
     col0data, col1data, col2data, col3data,
     col4data, col5data, col6data, col7data };
 
 Adafruit_BicolorMatrix matrix = Adafruit_BicolorMatrix();
 
 void setup() {
-  uint8_t i, j, nBins, binNum, *data;
+  uint8_t i, j, nBins, *data;
 
   memset(peak, 0, sizeof(peak));
   memset(col , 0, sizeof(col));
@@ -122,7 +123,6 @@ void setup() {
     maxLvlAvg[i] = 512;
     data         = (uint8_t *)pgm_read_word(&colData[i]);
     nBins        = pgm_read_byte(&data[0]) + 2;
-    binNum       = pgm_read_byte(&data[1]);
     for(colDiv[i]=0, j=2; j<nBins; j++)
       colDiv[i] += pgm_read_byte(&data[j]);
   }
@@ -145,7 +145,7 @@ void setup() {
 
 
 void loop() {
-  uint8_t  i, x, L, *data, nBins, binNum, weighting, c;
+  uint8_t  i, x, L, *data, nBins, binNum, c;
   uint16_t minLvl, maxLvl;
   int      level, y, sum;
 
